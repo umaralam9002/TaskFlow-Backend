@@ -12,20 +12,24 @@ const reportRoutes = require("./routes/reportRoutes");
 
 const app = express();
 
-app.use(
-    cors({
-        origin: process.env.CLIENT_URL || "*",
-        methods: ["GET","POST","PUT","DELETE"],
-        allowedHeaders:["Content-Type", "Authorization"],
-    })
-);
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    process.env.CLIENT_URL
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+}));
 
 
-connectToMongo();
+// connectToMongo();
 
 app.use(express.json());
 
-
+app.get("/", (req, res) => {
+  res.send("TaskFlow Backend is Live ");
+});
 // Routes
 app.use("/api/auth",authRoutes);
 app.use("/api/users",userRoutes);
@@ -34,5 +38,15 @@ app.use("/api/reports", reportRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT,()=>console.log(`Server running on port ${PORT}`))
+// const PORT = process.env.PORT || 8000;
+// app.listen(PORT,()=>console.log(`Server running on port ${PORT}`))
+const startServer = async () => {
+  await connectToMongo();
+
+  const PORT = process.env.PORT || 8000;
+  app.listen(PORT, () => {
+    console.log(`✅ Server running on port ${PORT}`);
+  });
+};
+
+startServer();
